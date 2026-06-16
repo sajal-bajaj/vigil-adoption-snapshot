@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vigil Demo Website (Frontend Only)</title>
+  <style>
+    :root {
+      --bg: #101217;
+      --panel: #1a1d23;
+      --panel-soft: #1f232c;
+      --border: #333946;
+      --text: #e8ecf2;
+      --muted: #a8b0bc;
+      --purple: #4a154b;
+      --purple-dark: #32123a;
+      --brand: #36c5f0;
+      --green: #22c55e;
+      --green-dark: #0f4d2b;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --button: #252b35;
+      --button-border: #4d5667;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      --radius: 10px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background:
+        radial-gradient(1200px 520px at 20% -10%, #321f4e 0%, transparent 60%),
+        radial-gradient(1200px 520px at 85% -10%, #2b1e48 0%, transparent 60%),
+        var(--bg);
+      color: var(--text);
+      padding: 16px;
+    }
+
+    .app {
+      width: min(1600px, 100%);
+      height: calc(100vh - 32px);
+      margin: 0 auto;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #394052;
+      box-shadow: var(--shadow);
+      background: var(--panel);
+      display: grid;
+      grid-template-rows: 46px 1fr;
+    }
+
+    .topbar {
+      background: linear-gradient(180deg, var(--purple), var(--purple-dark));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: grid;
+      grid-template-columns: 62px 1fr 164px;
+      align-items: center;
+      padding: 0 10px;
+    }
+
+    .logo {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, #5c2df2, #36c5f0);
+      display: grid;
+      place-items: center;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .search {
+      justify-self: center;
+      width: min(760px, 100%);
+      height: 31px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      background: rgba(255, 255, 255, 0.1);
+      color: #eee8ff;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    .search span {
+      opacity: 0.85;
+    }
+
+    .top-icons {
+      justify-self: end;
+      display: flex;
+      gap: 8px;
+    }
+
+    .top-icon {
+      width: 29px;
+      height: 29px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      background: rgba(255, 255, 255, 0.08);
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: #f6f2ff;
+    }
+
+    .layout {
+      height: 100%;
+      display: grid;
+      grid-template-columns: 68px 260px 1fr 430px;
+      overflow: hidden;
+    }
+
+    .rail {
+      border-right: 1px solid var(--border);
+      background: #17131a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+    }
+
+    .rail-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      border: 1px solid #3e4452;
+      background: #2a2d34;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #d6dbe2;
+    }
+
+    .rail-dot.active {
+      border-color: #2e8f98;
+      background: #1f5d61;
+    }
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+      background: #1a1d23;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .sidebar-head {
+      border-bottom: 1px solid var(--border);
+      padding: 14px 14px 10px;
+    }
+
+    .workspace-name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .workspace-sub {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .channels {
+      overflow: auto;
+      padding: 8px;
+    }
+
+    .channels .title {
+      margin: 8px 8px 6px;
+      color: #99a2af;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 600;
+    }
+
+    .channel {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      color: #c9d0d9;
+      text-align: left;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      display: flex;
+      gap: 7px;
+      cursor: default;
+    }
+
+    .channel.active {
+      color: #f4ebff;
+      background: #3b2952;
+    }
+
+    .sidebar-foot {
+      border-top: 1px solid var(--border);
+      padding: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pane {
+      display: grid;
+      grid-template-rows: 56px 1fr 88px;
+      min-width: 0;
+    }
+
+    .pane.main {
+      border-right: 1px solid var(--border);
+      background: #191c22;
+    }
+
+    .pane.thread {
+      background: #1c1f25;
+    }
+
+    .pane-head {
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px;
+      background: linear-gradient(180deg, #1f232b, #1a1d23);
+    }
+
+    .pane-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .pane-title small {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .head-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .head-mini {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid #3d4655;
+      background: #262c36;
+      color: #e6ebf2;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+
+    .feed {
+      overflow: auto;
+      padding: 14px 16px 24px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
+    .msg {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: 1px solid #475062;
+      background: #2f3642;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #dce3ed;
+    }
+
+    .avatar.cora {
+      background: #0f766e;
+      border-color: #14b8a6;
+    }
+
+    .avatar.vigil {
+      background: #243145;
+      border-color: #3b82f6;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .name {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .app-tag {
+      border: 1px solid #4f596b;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 1px 5px;
+      color: #d7deea;
+      background: #313848;
+    }
+
+    .time {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .msg-body {
+      margin-top: 7px;
+      line-height: 1.45;
+      color: #dce2eb;
+      font-size: 15px;
+    }
+
+    .alert-card {
+      margin-top: 8px;
+      border: 1px solid #454f61;
+      border-radius: 10px;
+      background: #202632;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+    }
+
+    .alert-title {
+      font-size: 20px;
+      line-height: 1.25;
+      font-weight: 800;
+      color: #f3f5f8;
+    }
+
+    .field-row {
+      font-size: 14px;
+      color: #dce3ed;
+    }
+
+    .field-row b {
+      color: #adbac9;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-right: 8px;
+    }
+
+    .pill {
+      display: inline-block;
+      border: 1px solid #5f6a7d;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 9px;
+      background: #2a3342;
+    }
+
+    .button-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .btn {
+      border: 1px solid var(--button-border);
+      border-radius: 8px;
+      background: var(--button);
+      color: #ecf1f8;
+      font-size: 13px;
+      font-weight: 700;
+      padding: 7px 11px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      filter: brightness(1.07);
+    }
+
+    .btn.green {
+      background: var(--green-dark);
+      border-color: #2b8e53;
+      color: #dbfbe9;
+    }
+
+    .btn.warn {
+      background: #3c3108;
+      border-color: #8f6e0c;
+      color: #ffefbc;
+    }
+
+    .btn.small {
+      padding: 5px 8px;
+      font-size: 12px;
+    }
+
+    .placeholder {
+      margin-top: 8px;
+      border-left: 3px solid var(--warning);
+      background: #302916;
+      border-radius: 0 8px 8px 0;
+      padding: 8px 10px;
+      font-size: 13px;
+      color: #fdecc4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff4d6;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .rca-card {
+      margin-top: 8px;
+      border: 1px solid #415067;
+      border-radius: 10px;
+      background: #1f2735;
+      padding: 12px;
+      display: grid;
+      gap: 8px;
+      font-size: 14px;
+      color: #dfe6f1;
+    }
+
+    .rca-card h4 {
+      margin: 0;
+      font-size: 14px;
+      color: #f3f6fb;
+      letter-spacing: 0.01em;
+    }
+
+    .rca-list {
+      margin: 0;
+      padding-left: 20px;
+      display: grid;
+      gap: 4px;
+    }
+
+    .known-card {
+      margin-top: 8px;
+      border: 1px solid #5a4b32;
+      background: #2f281b;
+      border-radius: 10px;
+      padding: 10px;
+      color: #f5e6c3;
+      font-size: 14px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .escalation {
+      margin-top: 8px;
+      border-top: 1px solid #3d4552;
+      padding-top: 8px;
+      color: #f0c2c2;
+      font-size: 13px;
+    }
+
+    .composer {
+      border-top: 1px solid var(--border);
+      padding: 10px 12px;
+      background: #191d23;
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .composer-box {
+      border: 1px solid #3f4756;
+      border-radius: 10px;
+      background: #232a35;
+      color: #d8e0ec;
+      min-height: 44px;
+      padding: 10px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+    }
+
+    .composer-tools {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #a8b0bc;
+      font-size: 13px;
+    }
+
+    .tool {
+      width: 28px;
+      height: 28px;
+      border: 1px solid #3f4756;
+      border-radius: 7px;
+      background: #252c37;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+    }
+
+    .send {
+      margin-left: auto;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 1px solid #2f8f55;
+      background: #14532d;
+      color: #dafbe7;
+      font-weight: 800;
+      display: grid;
+      place-items: center;
+    }
+
+    .toolbar {
+      position: absolute;
+      right: 14px;
+      top: 62px;
+      z-index: 10;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      max-width: 520px;
+    }
+
+    .toolbar .btn {
+      background: #222a35;
+      border-color: #445066;
+    }
+
+    .toolbar .btn.primary {
+      background: #15311f;
+      border-color: #2f8f55;
+      color: #dafbe7;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(7, 10, 16, 0.72);
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-backdrop.open {
+      display: grid;
+    }
+
+    .modal {
+      width: min(700px, 100%);
+      border-radius: 12px;
+      border: 1px solid #4b5568;
+      background: #1f2430;
+      box-shadow: var(--shadow);
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .close {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid #556074;
+      background: #252b37;
+      color: #e7ecf4;
+      cursor: pointer;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 14px;
+      color: #d6ddea;
+      font-weight: 600;
+    }
+
+    .field input,
+    .field textarea {
+      border: 1px solid #4d5a71;
+      border-radius: 8px;
+      background: #111827;
+      color: #ebf0f9;
+      padding: 10px;
+      font-size: 14px;
+      width: 100%;
+      resize: vertical;
+    }
+
+    .field textarea {
+      min-height: 110px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      background: #14281b;
+      border: 1px solid #2d7f4f;
+      color: #d7f7e4;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 180ms ease;
+      z-index: 120;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 1300px) {
+      .layout {
+        grid-template-columns: 62px 240px 1fr 380px;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 62px 220px 1fr;
+      }
+
+      .pane.thread {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="logo">V</div>
+      <div class="search"><span>Search G-P</span></div>
+      <div class="top-icons">
+        <div class="top-icon">?</div>
+        <div class="top-icon">@</div>
+        <div class="top-icon">⋯</div>
+      </div>
+    </div>
+
+    <div class="layout">
+      <aside class="rail">
+        <div class="rail-dot active">H</div>
+        <div class="rail-dot">D</div>
+        <div class="rail-dot">A</div>
+        <div class="rail-dot">F</div>
+        <div class="rail-dot">L</div>
+        <div class="rail-dot">+</div>
+      </aside>
+
+      <aside class="sidebar">
+        <div class="sidebar-head">
+          <div class="workspace-name">Globalization Partners</div>
+          <div class="workspace-sub">You're viewing channels in this workspace.</div>
+        </div>
+        <div class="channels">
+          <div class="title">Channels</div>
+          <button class="channel"><span>#</span> core-customer-domain-prod-alerts</button>
+          <button class="channel"><span>#</span> core-worker-domain-prod-alerts</button>
+          <button class="channel"><span>#</span> iac-internal</button>
+          <button class="channel active"><span>#</span> iac-alerts-prod</button>
+          <button class="channel"><span>#</span> iac-agent-collab</button>
+          <button class="channel"><span>#</span> iac-edge-alert-prod</button>
+          <button class="channel"><span>#</span> partners-sso-alerts</button>
+          <button class="channel"><span>#</span> accounting-service-notifications-prod</button>
+        </div>
+        <div class="sidebar-foot">Frontend placeholder demo (no backend)</div>
+      </aside>
+
+      <section class="pane main">
+        <header class="pane-head">
+          <div class="pane-title"># iac-alerts-prod</div>
+          <div class="head-actions">
+            <div class="head-mini">24</div>
+            <div class="head-mini">🔍</div>
+            <div class="head-mini">⋯</div>
+          </div>
+        </header>
+
+        <div id="mainFeed" class="feed"></div>
+
+        <footer class="composer">
+          <div class="composer-box">Message #iac-alerts-prod</div>
+          <div class="composer-tools">
+            <div class="tool">+</div>
+            <div class="tool">Aa</div>
+            <div class="tool">@</div>
+            <div class="tool">🙂</div>
+            <div class="send">➤</div>
+          </div>
+        </footer>
+      </section>
+
+      <section class="pane thread">
+        <header class="pane-head">
+          <div class="pane-title">Thread <small># iac-alerts-prod</small></div>
+          <div class="head-actions">
+            <div class="head-mini">⎚</div>
+            <div class="head-mini">⋯</div>
+            <div class="head-mini">✕</div>
+          </div>
+        </header>
+
+        <div id="threadFeed" class="feed"></div>
+
+        <footer class="composer">
+          <div class="composer-box">Reply in thread...</div>
+          <div class="composer-tools">
+            <div class="tool">+</div>
+            <div class="tool">Aa</div>
+            <div class="tool">@</div>
+            <div class="tool">🙂</div>
+            <div class="send">➤</div>
+          </div>
+        </footer>
+      </section>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button id="runFlowBtn" class="btn primary">Run Demo Flow</button>
+    <button id="sameAlertBtn" class="btn">Trigger Same Alert</button>
+    <button id="resetBtn" class="btn">Reset</button>
+  </div>
+
+  <div id="modalBackdrop" class="modal-backdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <span>📌 Mark Known Issue</span>
+        <button id="closeModalBtn" class="close">✕</button>
+      </div>
+      <div class="field">
+        <label for="jiraInput">JIRA Ticket URL (optional)</label>
+        <input id="jiraInput" type="text" placeholder="https://jira.example.com/CORE-1234">
+      </div>
+      <div class="field">
+        <label for="commentInput">Comment (why is this known?) (optional)</label>
+        <textarea id="commentInput" placeholder="Expected during deployment window"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button id="cancelModalBtn" class="btn">Cancel</button>
+        <button id="confirmKnownBtn" class="btn green">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    const mainFeed = document.getElementById("mainFeed");
+    const threadFeed = document.getElementById("threadFeed");
+    const runFlowBtn = document.getElementById("runFlowBtn");
+    const sameAlertBtn = document.getElementById("sameAlertBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const cancelModalBtn = document.getElementById("cancelModalBtn");
+    const confirmKnownBtn = document.getElementById("confirmKnownBtn");
+    const jiraInput = document.getElementById("jiraInput");
+    const commentInput = document.getElementById("commentInput");
+    const toast = document.getElementById("toast");
+
+    const state = {
+      timers: [],
+      alertCount: 0,
+      runCount: 0,
+      knownIssue: null,
+      lastRcaVersion: 0,
+      pendingKnownTarget: null
+    };
+
+    function schedule(fn, delayMs) {
+      const id = setTimeout(fn, delayMs);
+      state.timers.push(id);
+      return id;
+    }
+
+    function clearTimers() {
+      state.timers.forEach((id) => clearTimeout(id));
+      state.timers = [];
+    }
+
+    function nowLabel() {
+      const d = new Date();
+      return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 1800);
+    }
+
+    function scrollFeedsToBottom() {
+      mainFeed.scrollTop = mainFeed.scrollHeight;
+      threadFeed.scrollTop = threadFeed.scrollHeight;
+    }
+
+    function msgShell(sender, opts = {}) {
+      const avatarClass = opts.avatarClass || "";
+      const appTag = opts.app ? `<span class="app-tag">APP</span>` : "";
+      return `
+        <article class="msg">
+          <div class="avatar ${avatarClass}">${opts.avatar || "U"}</div>
+          <div>
+            <div class="meta">
+              <span class="name">${sender}</span>
+              ${appTag}
+              <span class="time">${opts.time || nowLabel()}</span>
+            </div>
+            <div class="msg-body">${opts.body || ""}</div>
+          </div>
+        </article>
+      `;
+    }
+
+    function addToBoth(html) {
+      mainFeed.insertAdjacentHTML("beforeend", html);
+      threadFeed.insertAdjacentHTML("beforeend", html);
+      scrollFeedsToBottom();
+    }
+
+    function addAlertMessage() {
+      state.alertCount += 1;
+      const html = msgShell("Coralogix", {
+        avatar: "C",
+        avatarClass: "cora",
+        app: true,
+        body: `
+          <div class="alert-card">
+            <div class="alert-title">🚨 Triggered P2 - BRM - 5XX errors</div>
+            <div class="field-row"><b>Alert Type</b><span class="pill">Metric Threshold</span></div>
+            <div class="field-row"><b>Condition</b>> 3 for 0% of 15 minutes</div>
+            <div class="field-row"><b>Service</b>gp-core-role-mgmt-ts-prod-private-api</div>
+            <div class="button-row">
+              <button class="btn green">VIEW ALERT</button>
+              <button class="btn green">EDIT ALERT</button>
+            </div>
+          </div>
+        `
+      });
+      addToBoth(html);
+    }
+
+    function addVigilPlaceholder(text) {
+      const placeholderId = `placeholder-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      const html = msgShell("vigil", {
+        avatar: "V",
+        avatarClass: "vigil",
+        app: true,
+        body: `
+          <div id="${placeholderId}" class="placeholder">
+            <span class="spinner"></span>
+            <span>${text}</span>
+          </div>
+        `
+      });
+      addToBoth(html);
+      return placeholderId;
+    }
+
+    function removePlaceholder(placeholderId) {
+      document.querySelectorAll(`#${placeholderId}`).forEach((el) => {
+        const parentMsg = el.closest(".msg");
+        if (parentMsg) parentMsg.remove();
+      });
+    }
+
+    function buildRcaCard(versionLabel = "Fresh RCA") {
+      const knownButton = state.knownIssue
+        ? `<button class="btn small" disabled title="Already marked as known issue">📌 Marked</button>`
+        : `<button class="btn small" data-action="mark-known">📌 Mark Known Issue</button>`;
+
+      return `
+        <div class="rca-card">
+          <h4>${versionLabel}</h4>
+          <div><b>Summary:</b> BRM GetUser Lambda 502 due to stale PostgreSQL connection reuse.</div>
+          <div><b>Root Cause:</b> warm invocation reused an invalid DB client after idle timeout.</div>
+          <div>
+            <h4>Evidence</h4>
+            <ul class="rca-list">
+              <li>Connection terminated unexpectedly in Lambda logs</li>
+              <li>5XX spike aligns with DB timeout window</li>
+              <li>Repeated failures on same route and service</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Recommended Actions</h4>
+            <ul class="rca-list">
+              <li>Recreate DB client if health check fails</li>
+              <li>Add safe retry for transient connection failures</li>
+              <li>Track pool metrics and alert on stale clients</li>
+            </ul>
+          </div>
+          <div class="button-row">
+            <button class="btn warn" data-action="analyse">✨ Analyse</button>
+            ${knownButton}
+            <button class="btn small">👍 Helpful</button>
+            <button class="btn small">👎 Not Helpful</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function addVigilRca(versionLabel) {
+      state.lastRcaVersion += 1;
+      const html = msgShell("vigil", {
+        avatar: "V",
+        avatarClass: "vigil",
+        app: true,
+        body: buildRcaCard(versionLabel)
+      });
+      addToBoth(html);
+      bindDynamicActions();
+    }
+
+    function addCachedReply() {
+      const escalationLine = state.alertCount >= 2
+        ? `<div class="escalation">🚨 This alert has fired ${state.alertCount}x in 6 hours - cc: @ChannelManager</div>`
+        : "";
+
+      const knownButton = state.knownIssue
+        ? `<button class="btn small" disabled>📌 Marked</button>`
+        : `<button class="btn small" data-action="mark-known">📌 Mark Known Issue</button>`;
+
+      const html = msgShell("vigil", {
+        avatar: "V",
+        avatarClass: "vigil",
+        app: true,
+        body: `
+          <div class="rca-card">
+            <h4>Cached RCA</h4>
+            <div>A recent analysis exists for this alert. Reusing previous result for instant response.</div>
+            <div><a href="#" style="color: var(--brand); text-decoration: none;">🔗 View full RCA in previous thread</a></div>
+            <div class="button-row">
+              <button class="btn warn" data-action="analyse">✨ Analyse</button>
+              ${knownButton}
+            </div>
+            ${escalationLine}
+          </div>
+        `
+      });
+      addToBoth(html);
+      bindDynamicActions();
+    }
+
+    function addKnownIssueReply() {
+      const jira = state.knownIssue?.jira || "No Jira link provided";
+      const comment = state.knownIssue?.comment || "Known recurring issue";
+      const escalationLine = state.alertCount >= 2
+        ? `<div class="escalation">🚨 This alert has fired ${state.alertCount}x in 6 hours - cc: @ChannelManager</div>`
+        : "";
+
+      const html = msgShell("vigil", {
+        avatar: "V",
+        avatarClass: "vigil",
+        app: true,
+        body: `
+          <div class="known-card">
+            <div><b>📌 Known Issue</b> - This alert has been marked as known issue.</div>
+            <div>Comment: ${comment}</div>
+            <div>JIRA: <a href="${jira}" style="color: var(--brand); text-decoration: none;">${jira}</a></div>
+            <div class="button-row">
+              <button class="btn warn" data-action="analyse">✨ Analyse</button>
+            </div>
+            ${escalationLine}
+          </div>
+        `
+      });
+      addToBoth(html);
+      bindDynamicActions();
+    }
+
+    function runPrimaryFlow() {
+      state.runCount += 1;
+      addAlertMessage();
+      const p = addVigilPlaceholder("Analyzing alert - This may take a few minutes...");
+      schedule(() => {
+        removePlaceholder(p);
+        addVigilRca(state.runCount === 1 ? "Fresh RCA" : `Fresh RCA (Run ${state.runCount})`);
+      }, 2300);
+    }
+
+    function handleAnalyseClick() {
+      const p = addVigilPlaceholder("Analysis requested by @you - generating fresh RCA...");
+      schedule(() => {
+        removePlaceholder(p);
+        addVigilRca(`Fresh RCA (Re-Analyze v${state.lastRcaVersion + 1})`);
+      }, 1800);
+      showToast("Analyse requested");
+    }
+
+    function openKnownIssueModal(targetButton) {
+      state.pendingKnownTarget = targetButton || null;
+      modalBackdrop.classList.add("open");
+      jiraInput.focus();
+    }
+
+    function closeKnownIssueModal() {
+      modalBackdrop.classList.remove("open");
+      state.pendingKnownTarget = null;
+    }
+
+    function confirmKnownIssue() {
+      state.knownIssue = {
+        jira: jiraInput.value.trim() || "https://jira.example.com/NOVACORE-43113",
+        comment: commentInput.value.trim() || "Expected recurring issue while permanent fix is in progress",
+        markedAt: new Date().toISOString()
+      };
+      closeKnownIssueModal();
+      addKnownIssueReply();
+      showToast("Known issue marked");
+    }
+
+    function triggerSameAlertFlow() {
+      addAlertMessage();
+      if (state.knownIssue) {
+        addKnownIssueReply();
+        return;
+      }
+      if (state.lastRcaVersion > 0) {
+        addCachedReply();
+        return;
+      }
+      runPrimaryFlow();
+    }
+
+    function bindDynamicActions() {
+      document.querySelectorAll('[data-action="analyse"]').forEach((btn) => {
+        if (btn.dataset.bound === "1") return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", handleAnalyseClick);
+      });
+
+      document.querySelectorAll('[data-action="mark-known"]').forEach((btn) => {
+        if (btn.dataset.bound === "1") return;
+        btn.dataset.bound = "1";
+        btn.addEventListener("click", () => openKnownIssueModal(btn));
+      });
+    }
+
+    function resetDemo() {
+      clearTimers();
+      mainFeed.innerHTML = "";
+      threadFeed.innerHTML = "";
+      state.alertCount = 0;
+      state.runCount = 0;
+      state.lastRcaVersion = 0;
+      state.knownIssue = null;
+      jiraInput.value = "";
+      commentInput.value = "";
+      closeKnownIssueModal();
+      runPrimaryFlow();
+      showToast("Demo reset");
+    }
+
+    runFlowBtn.addEventListener("click", runPrimaryFlow);
+    sameAlertBtn.addEventListener("click", triggerSameAlertFlow);
+    resetBtn.addEventListener("click", resetDemo);
+
+    closeModalBtn.addEventListener("click", closeKnownIssueModal);
+    cancelModalBtn.addEventListener("click", closeKnownIssueModal);
+    modalBackdrop.addEventListener("click", (event) => {
+      if (event.target === modalBackdrop) closeKnownIssueModal();
+    });
+    confirmKnownBtn.addEventListener("click", confirmKnownIssue);
+
+    // Initial state for demo.
+    runPrimaryFlow();
+  </script>
+</body>
+</html>
