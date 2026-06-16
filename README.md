@@ -4,7 +4,7 @@ Static frontend demo for Vigil adoption messaging.
 
 ## Pages
 
-- `index.html` - interactive Slack-style Vigil product demo (frontend only)
+- `index.html` - redirects to the adoption slide (site entrypoint)
 - `adoption-slide.html` - animated adoption metrics + onboarding CTA slide
 
 ## Notes
